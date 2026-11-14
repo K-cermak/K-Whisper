@@ -18,6 +18,20 @@ REPO_URL = "https://github.com/ggml-org/whisper.cpp.git"
 
 ROOT = Path(__file__).resolve().parent.parent
 BUILD_DIR = ROOT / "build" / "whispercpp"
+HOST_TOOLCHAIN = BUILD_DIR / "host-toolchain.cmake"
+
+# The Vulkan shader generator runs during the build, so a cross build also compiles it for the host. Left to
+# itself ggml picks the first of cl, gcc, clang on PATH; on GitHub's Windows runners that is MinGW's gcc, and
+# its program then fails to start (0xc0000139) against another libstdc++ DLL on PATH. clang is what the arm64
+# build itself uses.
+HOST_TOOLCHAIN_TEXT = """\
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
+"""
 
 
 def run(cmd: list[str], **kwargs) -> None:
@@ -62,6 +76,8 @@ def cmake_options(plat: str, vulkan: bool, src: Path, cross: bool) -> list[str]:
         # Same approach as llama.cpp releases: clang targeting arm64 on an x64 host, so the Vulkan
         # shader generator can still run natively during the build.
         opts += ["-G", "Ninja Multi-Config", f"-DCMAKE_TOOLCHAIN_FILE={src / 'cmake' / 'arm64-windows-llvm.cmake'}"]
+        if vulkan:
+            opts.append(f"-DGGML_VULKAN_SHADERS_GEN_TOOLCHAIN={HOST_TOOLCHAIN.as_posix()}")
     return opts
 
 
@@ -113,6 +129,8 @@ def main() -> None:
         src.parent.mkdir(parents=True, exist_ok=True)
         run(["git", "clone", "--depth", "1", "--branch", WHISPER_CPP_TAG, REPO_URL, str(src)])
 
+    if args.windows_arm64_cross:
+        HOST_TOOLCHAIN.write_text(HOST_TOOLCHAIN_TEXT)
     options = cmake_options(plat, not args.no_vulkan, src, args.windows_arm64_cross)
     run(["cmake", "-S", str(src), "-B", str(build), *options])
     # No --target: with GGML_BACKEND_DL the backend modules are not link dependencies of whisper-cli.

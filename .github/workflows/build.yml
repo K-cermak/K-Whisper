@@ -58,6 +58,8 @@ jobs:
           tar -xJf "$RUNNER_TEMP/vulkansdk.tar.xz" -C "$RUNNER_TEMP/vulkansdk" --strip-components=1
           echo "VULKAN_SDK=$RUNNER_TEMP/vulkansdk/x86_64" >> "$GITHUB_ENV"
           echo "$RUNNER_TEMP/vulkansdk/x86_64/bin" >> "$GITHUB_PATH"
+          # Newer SDKs keep the loader in lib/VulkanLoader/lib; CMake's FindVulkan only looks in lib.
+          echo "CMAKE_LIBRARY_PATH=$RUNNER_TEMP/vulkansdk/x86_64/lib/VulkanLoader/lib" >> "$GITHUB_ENV"
 
       - name: Vulkan SDK (Linux arm64)
         if: steps.cache.outputs.cache-hit != 'true' && matrix.platform == 'linux-arm64'
