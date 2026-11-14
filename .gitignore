@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+vendor/
+test-assets/
+.claude/
+# A recording dropped into the project for trying the app, and what transcribing it writes next to it
+/*.mp4
+/*.srt
+/*.vtt
+/*.txt
+/*.tsv
+/*.json
+*.spec.bak
+.DS_Store

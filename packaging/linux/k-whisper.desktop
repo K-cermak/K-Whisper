@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=K-Whisper
+Comment=Transcription and subtitles with whisper.cpp
+Exec=k-whisper %F
+Icon=k-whisper
+Terminal=false
+Categories=AudioVideo;Audio;Video;Utility;
+MimeType=audio/mpeg;audio/x-wav;audio/flac;audio/ogg;audio/mp4;video/mp4;video/x-matroska;video/webm;video/quicktime;

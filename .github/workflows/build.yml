@@ -1,0 +1,241 @@
+name: Build
+
+# Release builds run on version tags (v1.2.3) and on demand. They are not triggered by every push:
+# macOS minutes are expensive for private repositories.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  VULKAN_SDK_VERSION: 1.4.357.0
+
+jobs:
+  # --- whisper.cpp ------------------------------------------------------------------------------
+  whisper:
+    name: whisper.cpp / ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-arm64
+            os: macos-14
+          - platform: windows-x64
+            os: windows-2025
+          - platform: windows-arm64
+            os: windows-2025 # cross-compiled; packaged natively on windows-11-arm below
+            flags: --windows-arm64-cross
+          - platform: linux-x64
+            os: ubuntu-22.04
+          - platform: linux-arm64
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Cache whisper.cpp build
+        id: cache
+        uses: actions/cache@v5
+        with:
+          path: vendor/${{ matrix.platform }}/whisper
+          key: whisper-${{ matrix.platform }}-${{ hashFiles('scripts/build_whispercpp.py') }}-${{ env.VULKAN_SDK_VERSION }}
+
+      - name: Vulkan SDK (Linux x64)
+        if: steps.cache.outputs.cache-hit != 'true' && matrix.platform == 'linux-x64'
+        # The tarball of the pinned version; the LunarG apt repository always installs its latest SDK.
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/vulkansdk.tar.xz" \
+            "https://sdk.lunarg.com/sdk/download/${VULKAN_SDK_VERSION}/linux/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz"
+          mkdir -p "$RUNNER_TEMP/vulkansdk"
+          tar -xJf "$RUNNER_TEMP/vulkansdk.tar.xz" -C "$RUNNER_TEMP/vulkansdk" --strip-components=1
+          echo "VULKAN_SDK=$RUNNER_TEMP/vulkansdk/x86_64" >> "$GITHUB_ENV"
+          echo "$RUNNER_TEMP/vulkansdk/x86_64/bin" >> "$GITHUB_PATH"
+
+      - name: Vulkan SDK (Linux arm64)
+        if: steps.cache.outputs.cache-hit != 'true' && matrix.platform == 'linux-arm64'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential glslc libvulkan-dev spirv-headers
+
+      - name: Vulkan SDK (Windows)
+        if: steps.cache.outputs.cache-hit != 'true' && startsWith(matrix.platform, 'windows')
+        shell: pwsh
+        run: |
+          curl.exe -o $env:RUNNER_TEMP/VulkanSDK-Installer.exe -L "https://sdk.lunarg.com/sdk/download/${env:VULKAN_SDK_VERSION}/windows/vulkansdk-windows-X64-${env:VULKAN_SDK_VERSION}.exe"
+          & "$env:RUNNER_TEMP\VulkanSDK-Installer.exe" --accept-licenses --default-answer --confirm-command install ${{ matrix.platform == 'windows-arm64' && 'com.lunarg.vulkan.arm64' || '' }}
+          Add-Content $env:GITHUB_ENV "VULKAN_SDK=C:\VulkanSDK\${env:VULKAN_SDK_VERSION}"
+          Add-Content $env:GITHUB_PATH "C:\VulkanSDK\${env:VULKAN_SDK_VERSION}\bin"
+          if ("${{ matrix.platform }}" -eq "windows-arm64") { choco install ninja -y }
+
+      - name: Build
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: uv run --no-project python scripts/build_whispercpp.py ${{ matrix.flags }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: whisper-${{ matrix.platform }}
+          path: vendor/${{ matrix.platform }}/whisper
+          retention-days: 3
+
+  # --- application ------------------------------------------------------------------------------
+  package:
+    name: package / ${{ matrix.platform }}
+    needs: whisper
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-arm64
+            os: macos-14
+          - platform: windows-x64
+            os: windows-2025
+          - platform: windows-arm64
+            os: windows-11-arm
+          - platform: linux-x64
+            os: ubuntu-22.04
+          - platform: linux-arm64
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Version
+        run: |
+          VERSION=$(grep -m1 '^version' pyproject.toml | cut -d '"' -f2)
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            if [[ "${GITHUB_REF_NAME#v}" != "$VERSION" ]]; then
+              echo "::error::Tag $GITHUB_REF_NAME does not match pyproject version $VERSION"; exit 1
+            fi
+          else
+            VERSION="$VERSION-dev.$GITHUB_RUN_NUMBER"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: whisper-${{ matrix.platform }}
+          path: vendor/${{ matrix.platform }}/whisper
+
+      - name: Restore executable bits
+        if: ${{ !startsWith(matrix.platform, 'windows') }}
+        run: chmod +x vendor/${{ matrix.platform }}/whisper/whisper-cli
+
+      - name: Qt runtime libraries
+        if: startsWith(matrix.platform, 'linux')
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libdbus-1-3 \
+            libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0 \
+            libxcb-render-util0 libxcb-image0 libpulse0 nasm
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Cache ffmpeg
+        id: ffmpeg-cache
+        uses: actions/cache@v5
+        with:
+          path: vendor/${{ matrix.platform }}/ffmpeg
+          key: ffmpeg-${{ matrix.platform }}-${{ hashFiles('scripts/fetch_ffmpeg.py') }}
+
+      - name: ffmpeg
+        if: steps.ffmpeg-cache.outputs.cache-hit != 'true'
+        run: uv run --no-project python scripts/fetch_ffmpeg.py
+
+      - name: Cache test assets
+        uses: actions/cache@v5
+        with:
+          path: test-assets
+          key: test-assets-${{ hashFiles('scripts/fetch_test_assets.py') }}
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Tests
+        run: |
+          uv run python scripts/fetch_test_assets.py
+          uv run pytest -v
+
+      - name: PyInstaller
+        run: uv run pyinstaller --noconfirm packaging/k-whisper.spec
+
+      - name: Smoke test (packaged app)
+        run: |
+          case "${{ matrix.platform }}" in
+            macos-*) APP="dist/K-Whisper.app/Contents/MacOS/K-Whisper" ;;
+            windows-*) APP="dist/K-Whisper/K-Whisper.exe" ;;
+            *) APP="dist/K-Whisper/K-Whisper" ;;
+          esac
+          set +e
+          "$APP" --smoke-test --model "$PWD/test-assets/ggml-tiny.bin" --input "$PWD/test-assets/jfk.wav" \
+            --expect "ask not what your country" --log smoke.log
+          CODE=$?
+          cat smoke.log
+          exit $CODE
+
+      - name: Package (macOS)
+        if: startsWith(matrix.platform, 'macos')
+        run: bash packaging/macos/make_dmg.sh "$VERSION"
+
+      - name: Package (Linux)
+        if: startsWith(matrix.platform, 'linux')
+        run: bash packaging/linux/make_appimage.sh "$VERSION" "${{ endsWith(matrix.platform, 'arm64') && 'arm64' || 'x64' }}"
+
+      - name: Package (Windows)
+        if: startsWith(matrix.platform, 'windows')
+        shell: pwsh
+        run: |
+          $arch = "${{ endsWith(matrix.platform, 'arm64') && 'arm64' || 'x64' }}"
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+          }
+          & $iscc /DAppVersion=$env:VERSION /DArch=$arch packaging\windows\k-whisper.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Compress-Archive -Path dist\K-Whisper -DestinationPath "dist\K-Whisper-$env:VERSION-windows-$arch-portable.zip"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: K-Whisper-${{ matrix.platform }}
+          path: |
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.tar.gz
+            dist/*-setup.exe
+            dist/*-portable.zip
+          if-no-files-found: error
+
+  # --- release ----------------------------------------------------------------------------------
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: K-Whisper-*
+          path: release
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd release && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: release/*
