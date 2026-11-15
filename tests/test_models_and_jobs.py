@@ -152,7 +152,7 @@ def test_skipping_leaves_recordings_with_existing_files(qtbot, tmp_path):
     (tmp_path / "talk.srt").write_text("old", encoding="utf-8")
     settings = AppSettings(whisper_cli_path=__file__)  # any existing file passes the lookup
     queue = JobQueue(settings, ModelManager(models), state_file=tmp_path / "q.json")
-    queue.add_paths([tmp_path / "talk.wav"], TranscribeOptions(model="ggml-tiny.bin", language="en"))
+    queue.add_paths([tmp_path / "talk.wav"], TranscribeOptions(model="ggml-tiny.bin", language="en", vad=False))
     queue.on_existing = "skip"
     with qtbot.waitSignal(queue.all_done, timeout=3000):
         queue.start()

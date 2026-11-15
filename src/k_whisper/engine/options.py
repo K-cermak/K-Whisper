@@ -23,7 +23,7 @@ class TranscribeOptions:
     no_speech_threshold: float = 0.6
     suppress_non_speech: bool = False
 
-    vad: bool = False
+    vad: bool = True
     vad_threshold: float = 0.5
     vad_min_speech_ms: int = 250
     vad_min_silence_ms: int = 100

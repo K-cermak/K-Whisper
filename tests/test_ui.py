@@ -165,7 +165,7 @@ def test_turbo_model_cannot_translate(qtbot, tmp_path):
 def test_reset_keeps_the_main_window_choices(qtbot):
     install("light")
     chosen = with_mode(TranscribeOptions(model="ggml-tiny.bin", language="cs"), "transcript")
-    dialog = AdvancedDialog(chosen.updated(vad=True, beam_size=1), {})
+    dialog = AdvancedDialog(chosen.updated(vad=False, beam_size=1), {})
     qtbot.addWidget(dialog)
     dialog.set_options(dialog._defaults())
     assert dialog.options() == chosen

@@ -79,4 +79,4 @@ def test_output_modes():
 def test_advanced_changes_ignore_primary_options():
     opts = TranscribeOptions(model="ggml-tiny.bin", language="cs", translate=True, formats=["txt"])
     assert advanced_changes(opts) == []
-    assert advanced_changes(opts.updated(vad=True, beam_size=1)) == ["beam_size", "vad"]
+    assert advanced_changes(opts.updated(vad=False, beam_size=1)) == ["beam_size", "vad"]
