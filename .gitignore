@@ -8,6 +8,7 @@ dist/
 vendor/
 test-assets/
 .claude/
+private/
 # A recording dropped into the project for trying the app, and what transcribing it writes next to it
 /*.mp4
 /*.srt

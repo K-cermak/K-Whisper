@@ -1,8 +1,15 @@
-# K-Whisper
+<p align="center">
+  <img src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-logo.svg" width="700" height="150" alt="K-Whisper Logo">
+</p>
 
 Desktop application that turns recordings into subtitles and transcripts, built on [whisper.cpp](https://github.com/ggml-org/whisper.cpp) and Qt (PySide6).
 
 > **Note:** K-Whisper is heavily vibe-coded: most of its code was written with an AI assistant and only partly reviewed by a human. It is fine for everyday transcription, but it is not recommended for critical systems or anywhere a wrong or missing transcript could cause harm.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/queue-dark.png">
+  <img alt="The queue: one recording being transcribed with its newest line as a live caption, others done, failed or waiting" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/queue-light.png">
+</picture>
 
 - **One-button workflow**: pick a model, choose Subtitles / Transcript / Both and the spoken language, press Transcribe. Waiting recordings always follow these settings
 - **Queue**: drag & drop files or whole folders, media length shown up front, a live caption of the recording being transcribed, pause/stop/retry, open the results or show them in Finder/Explorer right from the row, transcribe finished recordings again with new settings; the queue survives restarts
@@ -12,6 +19,18 @@ Desktop application that turns recordings into subtitles and transcripts, built 
 - **Models**: a short list of the models most people need (every variant on request), smallest first, with compressed (quantized) versions explained; resumable SHA-256 verified downloads, import of custom GGML models, pick the model for new recordings
 - **Outputs**: SRT, WebVTT, TXT, TSV and JSON with word timings; subtitles are re-segmented into readable lines (line length, line count, duration)
 - **Acceleration**: Metal on macOS, Vulkan on Windows/Linux (NVIDIA, AMD, Intel), with automatic CPU fallback
+
+## Screenshots
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/models-dark.png">
+  <img alt="The Models page: models smallest first with their size, the recommended one marked, the one in use highlighted" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/models-light.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/advanced-dark.png">
+  <img width="480" alt="Advanced options: saved setups, output files and subtitle line rules" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/advanced-light.png">
+</picture>
 
 ## Downloads
 
