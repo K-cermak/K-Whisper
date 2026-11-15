@@ -2,7 +2,7 @@
   <img src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-logo.svg" width="700" height="150" alt="K-Whisper Logo">
 </p>
 
-Desktop application that turns recordings into subtitles and transcripts, built on [whisper.cpp](https://github.com/ggml-org/whisper.cpp) and Qt (PySide6).
+K-Whisper turns interviews, lectures, podcasts and videos into subtitles and written transcripts. Everything happens on your own computer: recordings are never uploaded anywhere, and once a speech model is downloaded, it works without an internet connection.
 
 > **Note:** K-Whisper is heavily vibe-coded: most of its code was written with an AI assistant and only partly reviewed by a human. It is fine for everyday transcription, but it is not recommended for critical systems or anywhere a wrong or missing transcript could cause harm.
 
@@ -11,14 +11,44 @@ Desktop application that turns recordings into subtitles and transcripts, built 
   <img alt="The queue: one recording being transcribed with its newest line as a live caption, others done, failed or waiting" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/queue-light.png">
 </picture>
 
-- **One-button workflow**: pick a model, choose Subtitles / Transcript / Both and the spoken language, press Transcribe. Waiting recordings always follow these settings
-- **Queue**: drag & drop files or whole folders, media length shown up front, a live caption of the recording being transcribed, pause/stop/retry, open the results or show them in Finder/Explorer right from the row, transcribe finished recordings again with new settings; the queue survives restarts
-- **No silent overwrites**: when the subtitles or transcript already exist, K-Whisper asks whether to replace them, keep both or skip the recording
-- **First run**: until a model is downloaded, the model choice is off and the queue points to the Models page
-- **Advanced options** in their own window: output formats, subtitle line rules, names and terms prompt, silence skipping (Silero VAD), decoding, hardware, saved setups
-- **Models**: a short list of the models most people need (every variant on request), smallest first, with compressed (quantized) versions explained; resumable SHA-256 verified downloads, import of custom GGML models, pick the model for new recordings
-- **Outputs**: SRT, WebVTT, TXT, TSV and JSON with word timings; subtitles are re-segmented into readable lines (line length, line count, duration)
-- **Acceleration**: Metal on macOS, Vulkan on Windows/Linux (NVIDIA, AMD, Intel), with automatic CPU fallback
+## What it does
+
+- **Subtitles, a transcript or both** from any audio or video file. Subtitles are split into lines that are easy to read.
+- **Many languages**: it recognizes the spoken language by itself, or you choose it. Every model except the Turbo ones can also translate the speech into English.
+- **Lots of recordings at once**: drop in files or whole folders and let it work through them. You see each line as it is recognized and how long is left, and you can pause, stop or try again. The list is still there after a restart.
+- **Files saved next to each recording**, or in one folder of your choice. Before anything existing would be replaced, it asks.
+- **A speech model that fits your computer**: small and fast, or larger and more accurate. A recommended one is marked, so you don't have to know the difference.
+- **Uses your graphics card** when it can (Apple Silicon Macs, and NVIDIA, AMD or Intel graphics on Windows and Linux), and the processor otherwise.
+- **More when you need it** in Advanced options: names and terms to spell correctly, skipping silent parts, subtitle line length, more file formats. Light and dark appearance.
+
+## Install
+
+Download the file for your computer from the **[latest release](https://github.com/K-cermak/K-Whisper/releases/latest)**:
+
+| Your computer | File to download |
+|---|---|
+| Mac with Apple Silicon (M1 or newer) | `K-Whisper-<version>-macos-arm64.dmg` |
+| Windows PC (Intel or AMD processor) | `K-Whisper-<version>-windows-x64-setup.exe`, or `K-Whisper-<version>-windows-x64-portable.zip` to run it without installing |
+| Windows on ARM (e.g. Snapdragon laptops) | `K-Whisper-<version>-windows-arm64-setup.exe`, or `K-Whisper-<version>-windows-arm64-portable.zip` |
+| Linux PC (Intel or AMD processor) | `K-Whisper-<version>-linux-x64.AppImage`, or `K-Whisper-<version>-linux-x64.tar.gz` |
+| Linux on ARM | `K-Whisper-<version>-linux-arm64.AppImage`, or `K-Whisper-<version>-linux-arm64.tar.gz` |
+
+Macs with an Intel processor are not supported.
+
+### First launch
+
+K-Whisper is not signed with a paid developer certificate, so your system asks once whether you trust it:
+
+- **macOS**: open the `.dmg` and drag K-Whisper into Applications. The first launch is blocked: open *System Settings › Privacy & Security*, scroll down and click **Open Anyway** (on macOS 14 and older, right-click the app › **Open** also works).
+- **Windows**: if a blue "Windows protected your PC" window appears, click **More info** › **Run anyway**.
+- **Linux**: allow the AppImage to run (right-click › *Properties* › *Allow executing as program*, or `chmod +x`), then open it. It needs the usual Qt libraries (e.g. `libxcb-cursor0`, `libxkbcommon-x11-0`, `libegl1`). The x64 version runs on Ubuntu 22.04, Debian 12 or newer (glibc 2.35+), the ARM version on Ubuntu 24.04 or newer (glibc 2.39+).
+
+## How to use it
+
+1. Open **Models** and download a speech model. The one marked **Recommended** suits most recordings.
+2. Drop recordings or whole folders onto the window, or click **Add files**.
+3. Under the list, choose what to make (**Subtitles**, **Transcript** or **Both**) and the spoken language, or leave it on *Detect automatically*.
+4. Click **Transcribe**. The files are saved next to each recording. Point at a finished row to open them or show them in Finder or Explorer.
 
 ## Screenshots
 
@@ -32,21 +62,16 @@ Desktop application that turns recordings into subtitles and transcripts, built 
   <img width="480" alt="Advanced options: saved setups, output files and subtitle line rules" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/advanced-light.png">
 </picture>
 
-## Downloads
+## For developers
 
-Installers are built by GitHub Actions (`Build` workflow) for:
+K-Whisper is built on [whisper.cpp](https://github.com/ggml-org/whisper.cpp) and Qt (PySide6).
 
-| Platform | Package |
-|---|---|
-| macOS (Apple Silicon) | `.dmg` |
-| Windows x64 / arm64 | installer `.exe` and portable `.zip` |
-| Linux x64 / arm64 | `.AppImage` and `.tar.gz` |
+- **Outputs**: SRT, WebVTT, TXT, TSV and JSON with word timings; subtitles are re-segmented into readable lines (line length, line count, duration)
+- **Models**: resumable SHA-256 verified downloads from Hugging Face, import of custom GGML models, every variant (quantized, English-only) on request
+- **Advanced options**: output formats, subtitle line rules, names and terms prompt, silence skipping (Silero VAD), decoding, hardware, saved setups
+- **Acceleration**: Metal on macOS, Vulkan on Windows/Linux (NVIDIA, AMD, Intel), with automatic CPU fallback
 
-The builds are not code-signed. On macOS, the first launch is blocked: open *System Settings › Privacy & Security* and click **Open Anyway** (on macOS 14 and older, right-click › **Open** also works). On Windows, SmartScreen may ask for confirmation.
-
-Linux builds need the usual Qt runtime libraries (e.g. `libxcb-cursor0`, `libxkbcommon-x11-0`, `libegl1`). The x64 build targets glibc 2.35+ (Ubuntu 22.04, Debian 12+); the arm64 build needs glibc 2.39+ (Ubuntu 24.04+).
-
-## Development
+### Development
 
 Requirements: [uv](https://docs.astral.sh/uv/), CMake, a C/C++ compiler, Git. On macOS, Xcode command line tools are enough.
 
@@ -76,14 +101,16 @@ dist/K-Whisper.app/Contents/MacOS/K-Whisper --smoke-test \
   --model test-assets/ggml-tiny.bin --input test-assets/jfk.wav --expect "ask not"
 ```
 
-## Releases
+### Releases
+
+Packages are built by GitHub Actions (`Build` workflow) for macOS (Apple Silicon) `.dmg`, Windows x64 / arm64 installer `.exe` and portable `.zip`, and Linux x64 / arm64 `.AppImage` and `.tar.gz`.
 
 1. Bump `version` in `pyproject.toml` (and `src/k_whisper/__init__.py`).
 2. Push a tag `vX.Y.Z`. The `Build` workflow builds all platforms, runs a smoke test on every packaged app and creates a **draft** GitHub release with the packages and `SHA256SUMS.txt`.
 
 The `Build` workflow can also be started manually (*Actions › Build › Run workflow*); the packages are then available as workflow artifacts.
 
-## How it works
+### How it works
 
 The GUI does not link whisper.cpp; it runs the bundled `whisper-cli` and `ffmpeg` executables as subprocesses (`QProcess`):
 
@@ -93,7 +120,7 @@ The GUI does not link whisper.cpp; it runs the bundled `whisper-cli` and `ffmpeg
 
 The optional JSON output keeps every word with its timing for further processing.
 
-## Project layout
+### Project layout
 
 ```
 src/k_whisper/        application package
