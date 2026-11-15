@@ -2,7 +2,7 @@ from pathlib import Path
 
 from k_whisper.engine import cli
 from k_whisper.engine.options import TranscribeOptions, advanced_changes, output_mode, with_mode
-from k_whisper.engine.runner import LineBuffer
+from k_whisper.engine.runner import LineBuffer, TranscriptionTask
 
 
 def test_whisper_args_defaults():
@@ -51,6 +51,15 @@ def test_parsers():
     assert cli.parse_backend("whisper_backend_init_gpu: using MTL0 backend") == "Metal"
     assert cli.parse_backend("ggml_vulkan: Found 1 Vulkan devices:") == "Vulkan"
     assert cli.parse_backend("random line") is None
+
+
+def test_vad_on_the_cpu_does_not_hide_the_gpu_backend():
+    task = TranscriptionTask(Path("a.wav"), TranscribeOptions(), Path("cli"), None, Path("m.bin"), Path("vad.bin"))
+    seen = []
+    task.backend_detected.connect(seen.append)
+    task._on_whisper_err("whisper_backend_init_gpu: using MTL0 backend")
+    task._on_whisper_err("whisper_backend_init_gpu: no GPU found")
+    assert seen == ["Metal"]
 
 
 def test_line_buffer_handles_partial_utf8_and_cr():

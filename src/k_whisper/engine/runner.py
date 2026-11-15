@@ -79,6 +79,7 @@ class TranscriptionTask(QObject):
         self._err = LineBuffer()
         self._tail: list[str] = []
         self._duration = 0.0
+        self._backend = ""
         self._cancelled = False
         self._done = False
 
@@ -86,6 +87,7 @@ class TranscriptionTask(QObject):
         self._tmp = Path(tempfile.mkdtemp(prefix="kwhisper-"))
         if not self.opts.use_gpu:
             # whisper.cpp logs nothing about the backend when the GPU is switched off.
+            self._backend = "CPU"
             self.backend_detected.emit("CPU")
         if self.ffmpeg:
             self._start_ffmpeg()
@@ -205,7 +207,9 @@ class TranscriptionTask(QObject):
             return
         if lang := cli.parse_detected_language(line):
             self.language_detected.emit(lang)
-        if backend := cli.parse_backend(line):
+        # The VAD model always runs on the CPU and logs "no GPU found" after the speech model's backend.
+        if not self._backend and (backend := cli.parse_backend(line)):
+            self._backend = backend
             self.backend_detected.emit(backend)
         self._remember(line)
 
