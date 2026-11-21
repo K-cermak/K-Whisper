@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pytest
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont, QFontMetrics
 from PySide6.QtNetwork import QSslSocket
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QPushButton
 
 from k_whisper.app import parse_args, use_system_tls
 from k_whisper.batch.job import Job, JobStatus
@@ -16,7 +17,7 @@ from k_whisper.ui.advanced_dialog import AdvancedDialog
 from k_whisper.ui.main_window import MainWindow
 from k_whisper.ui.queue_view import job_status, row_actions
 from k_whisper.ui.theme import install
-from k_whisper.ui.widgets import confirm
+from k_whisper.ui.widgets import CheckableButton, confirm
 
 
 def make_window(qtbot, tmp_path, model="ggml-tiny.bin", installed=None, **options) -> MainWindow:
@@ -187,3 +188,17 @@ def test_files_on_the_command_line():
 def test_https_uses_schannel_on_windows(qapp):
     use_system_tls()
     assert QSslSocket.activeBackend() == "schannel"
+
+
+def test_checked_buttons_leave_room_for_semibold_text(qtbot):
+    install("light")
+    plain, widened = QPushButton("Transcript"), CheckableButton("Transcript")
+    for b in (plain, widened):
+        b.setProperty("segment", "middle")
+        qtbot.addWidget(b)
+        b.ensurePolished()
+    bold = QFont(plain.font())
+    bold.setWeight(QFont.Weight.DemiBold)
+    extra = QFontMetrics(bold).horizontalAdvance("Transcript") - plain.fontMetrics().horizontalAdvance("Transcript")
+    assert extra > 0
+    assert widened.sizeHint().width() == plain.sizeHint().width() + extra

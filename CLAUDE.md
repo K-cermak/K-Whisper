@@ -44,6 +44,7 @@ uv run python scripts/make_screenshots.py [dir]  # README/website screenshots fr
 
 - The stylesheet sets the font family globally, so `setFont()` on widgets is overridden; use label roles or QSS. Delegates paint with `ui_font()` / `mono_font()`.
 - After changing a dynamic property used in a selector, call `repolish()`. Never name a property after an existing `QWidget` property (e.g. `size`): `setProperty` then fails silently.
+- Qt sizes a button for its regular weight, so a checked state set in semibold by QSS (segments, tabs) clips the text, most visibly on Windows; such buttons are `CheckableButton` / `CheckableToolButton` from `ui/widgets.py`.
 - A `Signal(int)` is 32-bit; byte counts use `"qint64"` (models are over 2 GB).
 - A word-wrapped `QLabel` with a maximum width inside a vertical layout gets clipped; wrap it with `capped()`.
 - Message boxes go through `confirm()` / `inform()`: no icon, a short headline (Qt bolds it on macOS) with details below, action-named buttons. Don't use `DestructiveRole`: Qt sets such buttons 28 px apart on macOS.

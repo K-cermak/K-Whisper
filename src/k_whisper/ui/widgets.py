@@ -4,6 +4,7 @@ toast, empty queue."""
 from pathlib import Path
 
 from PySide6.QtCore import QCoreApplication, QEvent, QPoint, QSize, QSortFilterProxyModel, Qt, QTimer, Signal
+from PySide6.QtGui import QFont, QFontMetrics
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QButtonGroup,
@@ -199,6 +200,27 @@ def refresh_icons(root: QWidget) -> None:
         b.setIcon(icon(name, color))
 
 
+def _with_bold_room(widget: QPushButton | QToolButton, hint: QSize) -> QSize:
+    """Widen a size hint for the semibold text the stylesheet sets on checked buttons.
+
+    Qt sizes buttons for the regular weight, so the checked text was clipped (by several pixels on Windows).
+    """
+    bold = QFont(widget.font())
+    bold.setWeight(QFont.Weight.DemiBold)
+    extra = QFontMetrics(bold).horizontalAdvance(widget.text()) - widget.fontMetrics().horizontalAdvance(widget.text())
+    return QSize(hint.width() + max(0, extra), hint.height())
+
+
+class CheckableButton(QPushButton):
+    def sizeHint(self) -> QSize:  # noqa: N802 - Qt API
+        return _with_bold_room(self, super().sizeHint())
+
+
+class CheckableToolButton(QToolButton):
+    def sizeHint(self) -> QSize:  # noqa: N802 - Qt API
+        return _with_bold_room(self, super().sizeHint())
+
+
 class Segmented(QWidget):
     """Adjacent exclusive buttons sharing one outline (a real segmented control, not separate pills)."""
 
@@ -212,7 +234,7 @@ class Segmented(QWidget):
         layout.setSpacing(0)
         keys = list(options)
         for i, key in enumerate(keys):
-            b = QPushButton(options[key])
+            b = CheckableButton(options[key])
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.setFocusPolicy(Qt.FocusPolicy.TabFocus)

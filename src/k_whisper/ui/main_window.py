@@ -39,6 +39,7 @@ from k_whisper.ui.run_bar import RunBar, model_name
 from k_whisper.ui.settings_dialog import SettingsDialog
 from k_whisper.ui.theme import install, logo, mono_font, repolish, theme
 from k_whisper.ui.widgets import (
+    CheckableToolButton,
     EmptyQueue,
     Toast,
     button,
@@ -125,7 +126,8 @@ class TopBar(QWidget):
         layout.addWidget(self.settings_btn)
 
     def _tab(self, text: str, page: int) -> QToolButton:
-        tab = QToolButton(text=text)
+        tab = CheckableToolButton()
+        tab.setText(text)
         tab.setObjectName("Tab")
         tab.setCheckable(True)
         tab.setCursor(Qt.CursorShape.PointingHandCursor)
