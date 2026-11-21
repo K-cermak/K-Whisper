@@ -200,5 +200,5 @@ def test_checked_buttons_leave_room_for_semibold_text(qtbot):
     bold = QFont(plain.font())
     bold.setWeight(QFont.Weight.DemiBold)
     extra = QFontMetrics(bold).horizontalAdvance("Transcript") - plain.fontMetrics().horizontalAdvance("Transcript")
-    assert extra > 0
-    assert widened.sizeHint().width() == plain.sizeHint().width() + extra
+    # The fonts on the Linux CI runner give semibold the same advance, so the difference may be zero there.
+    assert widened.sizeHint().width() == plain.sizeHint().width() + max(0, extra)
