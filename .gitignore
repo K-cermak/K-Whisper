@@ -19,3 +19,4 @@ private/
 *.spec.bak
 .DS_Store
 /Images/
+.playwright-mcp
