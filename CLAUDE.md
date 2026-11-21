@@ -19,6 +19,7 @@ uv run ruff check . && uv run ruff format --check .
 
 uv run pyinstaller --noconfirm packaging/k-whisper.spec   # local package build
 uv run python scripts/make_icons.py              # app icons (packaging/icons, resources/icon.png) from resources/logo.svg
+uv run python scripts/make_screenshots.py [dir]  # README/website screenshots from a mocked queue, light and dark
 ```
 
 - `scripts/fetch_ui_assets.py` deletes every SVG in `resources/icons/` and downloads the `ICONS` list again; add a new Lucide icon to that list, not only to the folder.
