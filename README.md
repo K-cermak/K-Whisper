@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-logo.svg" width="700" height="150" alt="K-Whisper Logo">
+  <img src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/logo.svg" width="700" alt="K-Whisper Logo">
 </p>
 
 K-Whisper turns interviews, lectures, podcasts and videos into subtitles and written transcripts. Everything happens on your own computer: recordings are never uploaded anywhere, and once a speech model is downloaded, it works without an internet connection.
@@ -7,8 +7,8 @@ K-Whisper turns interviews, lectures, podcasts and videos into subtitles and wri
 > **Note:** K-Whisper is heavily vibe-coded: most of its code was written with an AI assistant and only partly reviewed by a human. It is fine for everyday transcription, but it is not recommended for critical systems or anywhere a wrong or missing transcript could cause harm.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/queue-dark.png">
-  <img alt="The queue: one recording being transcribed with its newest line as a live caption, others done, failed or waiting" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/queue-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-queue-dark.png">
+  <img alt="The queue: one recording being transcribed with its newest line as a live caption, others done, failed or waiting" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-queue-light.png">
 </picture>
 
 ## What it does
@@ -53,13 +53,13 @@ K-Whisper is not signed with a paid developer certificate, so your system asks o
 ## Screenshots
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/models-dark.png">
-  <img alt="The Models page: models smallest first with their size, the recommended one marked, the one in use highlighted" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/models-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-models-dark.png">
+  <img alt="The Models page: models smallest first with their size, the recommended one marked, the one in use highlighted" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-models-light.png">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/advanced-dark.png">
-  <img width="480" alt="Advanced options: saved setups, output files and subtitle line rules" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/advanced-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-advanced-dark.png">
+  <img width="480" alt="Advanced options: saved setups, output files and subtitle line rules" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/github-advanced-light.png">
 </picture>
 
 ## For developers
