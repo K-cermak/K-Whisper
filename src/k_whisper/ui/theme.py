@@ -132,8 +132,8 @@ def pixmap(name: str, color: str, size: int = 18) -> QPixmap:
 
 
 def logo(size: int) -> QPixmap:
-    """The K-Whisper mark without a background: its letter is dark on light surfaces and white on dark ones."""
-    renderer = QSvgRenderer(str(RESOURCES / ("logo-white.svg" if theme().tokens.dark else "logo.svg")))
+    """The K-Whisper bird without a background; on dark surfaces its body is lighter to stay visible."""
+    renderer = QSvgRenderer(str(RESOURCES / ("logo-dark.svg" if theme().tokens.dark else "logo.svg")))
     app = QGuiApplication.instance()
     ratio = max(2.0, app.devicePixelRatio() if isinstance(app, QGuiApplication) else 2.0)
     pm = QPixmap(round(size * ratio), round(size * ratio))

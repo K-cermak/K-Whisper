@@ -1,6 +1,7 @@
 """Render the application icon from the logo and write PNG/ICO/ICNS variants.
 
-The logo has no background, so the icon puts it on a white tile, as app icons on macOS are expected to look.
+The logo (the bird, padded to a square viewBox) has no background, so the icon puts it on a white tile,
+as app icons on macOS are expected to look.
 The generated files are committed; re-run only when the logo changes:
     uv run python scripts/make_icons.py
 """
@@ -42,7 +43,7 @@ def render(size: int) -> QImage:
     p.setPen(QColor(0, 0, 0, 28))
     p.drawPath(path)
 
-    inset = 110 * s
+    inset = 96 * s
     QSvgRenderer(str(RESOURCES / "logo.svg")).render(p, tile.adjusted(inset, inset, -inset, -inset))
     p.end()
     return img

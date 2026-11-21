@@ -98,8 +98,8 @@ class TopBar(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
 
         mark = QLabel()
-        mark.setPixmap(logo(22))
-        theme().changed.connect(lambda: mark.setPixmap(logo(22)))
+        mark.setPixmap(logo(26))
+        theme().changed.connect(lambda: mark.setPixmap(logo(26)))
         wordmark = label(APP_NAME)
         wordmark.setObjectName("Wordmark")
         self.tabs = QButtonGroup(self)
