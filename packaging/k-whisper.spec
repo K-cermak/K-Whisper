@@ -18,6 +18,9 @@ ICONS = ROOT / "packaging" / "icons"
 BINARY_SUFFIXES = (".dll", ".so", ".dylib", ".exe")
 
 binaries, datas = [], [(str(ROOT / "src" / "k_whisper" / "resources"), "k_whisper/resources")]
+if PLAT.startswith("macos"):
+    # The icon with its dark variant (CFBundleIconName); icon.icns stays as the fallback for macOS before 26.
+    datas.append((str(ICONS / "Assets.car"), "."))
 for tool in ("whisper", "ffmpeg"):
     folder = VENDOR / tool
     if not folder.is_dir():
@@ -60,6 +63,7 @@ if PLAT.startswith("macos"):
         info_plist={
             "CFBundleShortVersionString": __version__,
             "CFBundleVersion": __version__,
+            "CFBundleIconName": "AppIcon",
             "LSMinimumSystemVersion": "13.3",
             "NSHighResolutionCapable": True,
             "NSRequiresAquaSystemAppearance": False,

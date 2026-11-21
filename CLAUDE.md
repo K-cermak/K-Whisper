@@ -18,7 +18,7 @@ uv run python scripts/fetch_test_assets.py       # tiny model + JFK sample; enab
 uv run ruff check . && uv run ruff format --check .
 
 uv run pyinstaller --noconfirm packaging/k-whisper.spec   # local package build
-uv run python scripts/make_icons.py              # app icons (packaging/icons, resources/icon.png) from resources/logo.svg
+uv run python scripts/make_icons.py              # app icons (packaging/icons, resources/icon.png) from resources/logo.svg; on macOS also AppIcon.icon + Assets.car (needs Xcode's actool)
 uv run python scripts/make_screenshots.py [dir]  # README/website screenshots from a mocked queue, light and dark
 ```
 
