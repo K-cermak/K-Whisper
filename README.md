@@ -2,6 +2,14 @@
   <img src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/logo.svg" width="700" alt="K-Whisper Logo">
 </p>
 
+<p align="center">
+  <a href="https://k-whisper.karlosoft.com/"><strong>Website</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/K-cermak/K-Whisper/releases/latest"><strong>Download</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/K-cermak/K-Whisper/issues"><strong>Report a problem</strong></a>
+</p>
+
 K-Whisper turns interviews, lectures, podcasts and videos into subtitles and written transcripts. Everything happens on your own computer: recordings are never uploaded anywhere, and once a speech model is downloaded, it works without an internet connection.
 
 > **Note:** K-Whisper is heavily vibe-coded: most of its code was written with an AI assistant and only partly reviewed by a human. It is fine for everyday transcription, but it is not recommended for critical systems or anywhere a wrong or missing transcript could cause harm.
