@@ -1,9 +1,12 @@
+import sys
 from pathlib import Path
 
+import pytest
 from PySide6.QtCore import Qt
+from PySide6.QtNetwork import QSslSocket
 from PySide6.QtWidgets import QMessageBox
 
-from k_whisper.app import parse_args
+from k_whisper.app import parse_args, use_system_tls
 from k_whisper.batch.job import Job, JobStatus
 from k_whisper.batch.queue import JobQueue
 from k_whisper.engine.options import TranscribeOptions, with_mode
@@ -178,3 +181,9 @@ def test_waiting_row_shows_the_silence_model_download():
 
 def test_files_on_the_command_line():
     assert parse_args(["/x/talk.mp4"]).files == [Path("/x/talk.mp4")]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Qt uses OpenSSL only on Windows")
+def test_https_uses_schannel_on_windows(qapp):
+    use_system_tls()
+    assert QSslSocket.activeBackend() == "schannel"

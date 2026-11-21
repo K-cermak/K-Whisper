@@ -48,5 +48,6 @@ uv run python scripts/make_screenshots.py [dir]  # README/website screenshots fr
 - A word-wrapped `QLabel` with a maximum width inside a vertical layout gets clipped; wrap it with `capped()`.
 - Message boxes go through `confirm()` / `inform()`: no icon, a short headline (Qt bolds it on macOS) with details below, action-named buttons. Don't use `DestructiveRole`: Qt sets such buttons 28 px apart on macOS.
 - Combo boxes need `combobox-popup: 0` (in the stylesheet), otherwise Fusion ignores `maxVisibleItems` and the list can fill the screen.
+- On Windows, HTTPS must go through Schannel (`app.use_system_tls()`): Qt's OpenSSL backend loads the system's `libssl-3-x64.dll`, which clashes with the same-named, different-version `libcrypto-3-x64.dll` that Python's `hashlib` loads, and the first HTTPS request crashes natively (seen with an OpenSSL 3.1 in System32).
 - `except A, B:` without parentheses is valid Python 3.14 syntax (PEP 758), not a bug.
 - To check UI changes without a display, run with `QT_QPA_PLATFORM=offscreen` and save `widget.grab()`; button-box order, popups and focus differ on macOS, so check those with the native platform.

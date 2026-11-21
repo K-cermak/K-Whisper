@@ -6,6 +6,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QCoreApplication, QLocale
 from PySide6.QtGui import QIcon
+from PySide6.QtNetwork import QSslSocket
 from PySide6.QtWidgets import QApplication
 
 from k_whisper import APP_NAME, ORG_NAME, __version__
@@ -25,6 +26,17 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     smoke.add_argument("--log", type=Path, help="write output to this file (windowed builds have no stdout)")
     args, _qt_args = parser.parse_known_args(argv)
     return args
+
+
+def use_system_tls() -> None:
+    """On Windows, make Qt use Schannel for HTTPS instead of OpenSSL.
+
+    Qt ships no OpenSSL on Windows and loads whatever libssl-3-x64.dll the system has (e.g. an old one another program
+    put in System32). Python's hashlib loads its own libcrypto-3-x64.dll of another version under the same name, and
+    the mix crashed the first HTTPS request. Must run before anything uses TLS.
+    """
+    if sys.platform == "win32":
+        QSslSocket.setActiveBackend("schannel")
 
 
 def run_smoke_test(args: argparse.Namespace) -> int:
@@ -84,6 +96,7 @@ def main() -> None:
     from k_whisper.ui.widgets import inform
 
     app = QApplication(sys.argv)
+    use_system_tls()
     # The interface is English, so numbers use English formatting whatever the system locale is.
     QLocale.setDefault(QLocale(QLocale.Language.English, QLocale.Country.UnitedStates))
     app.setWindowIcon(QIcon(str(RESOURCES / "icon.png")))
