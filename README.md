@@ -1,13 +1,16 @@
 <p align="center">
-  <img src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/logo.svg" width="700" alt="K-Whisper Logo">
-</p>
-
-<p align="center">
-  <a href="https://k-whisper.karlosoft.com/"><strong>Website</strong></a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/K-cermak/K-Whisper/releases/latest"><strong>Download</strong></a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/K-cermak/K-Whisper/issues"><strong>Report a problem</strong></a>
+  <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/logo.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/logo-dark.svg">
+      <img alt="K-Whisper" src="https://cdn.karlosoft.com/cdn-data/ks/img/kwhisper/logo-dark.svg" width="700">
+  </picture>
+  <p align="center">
+    <a href="https://k-whisper.karlosoft.com/"><strong>Website</strong></a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/K-cermak/K-Whisper/releases/latest"><strong>Download</strong></a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/K-cermak/K-Whisper/issues"><strong>Report a problem</strong></a>
+  </p>
 </p>
 
 <br>
